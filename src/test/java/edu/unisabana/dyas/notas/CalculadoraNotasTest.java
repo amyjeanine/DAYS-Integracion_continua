@@ -1,4 +1,4 @@
-﻿package edu.unisabana.dyas.notas;
+package edu.unisabana.dyas.notas;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
