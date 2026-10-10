@@ -29,6 +29,31 @@ public class CalculadoraNotas {
         return definitiva.setScale(1, RoundingMode.HALF_UP).doubleValue();
     }
 
+    /**
+     * Nota que se necesita en el tercer corte para llegar justo a 3.0.
+     * Se redondea hacia ARRIBA a una décima (si faltan 2.775, hay que sacar 2.8).
+     * Se usa BigDecimal a propósito: con double, (3.0, 3.0) da 3.0000000000000004
+     * y al subirlo a la décima termina en 3.1 en vez de 3.0.
+     *
+     * @throws IllegalStateException si ni sacando 5.0 se alcanza a aprobar
+     */
+    public double notaNecesariaTercerCorte(double corte1, double corte2) {
+        BigDecimal acumulado = validar(corte1, "corte 1").multiply(PESO_CORTE_1)
+                .add(validar(corte2, "corte 2").multiply(PESO_CORTE_2));
+        BigDecimal necesaria = NOTA_APROBATORIA.subtract(acumulado)
+                .divide(PESO_CORTE_3, 10, RoundingMode.HALF_UP);
+
+        if (necesaria.compareTo(NOTA_MAXIMA) > 0) {
+            throw new IllegalStateException(
+                    "Ya no es posible aprobar: haría falta un " + necesaria.setScale(1, RoundingMode.CEILING)
+                            + " en el tercer corte");
+        }
+        if (necesaria.compareTo(NOTA_MINIMA) < 0) {
+            return 0.0;
+        }
+        return necesaria.setScale(1, RoundingMode.CEILING).doubleValue();
+    }
+
     public boolean aprueba(double definitiva) {
         return validar(definitiva, "definitiva").compareTo(NOTA_APROBATORIA) >= 0;
     }
